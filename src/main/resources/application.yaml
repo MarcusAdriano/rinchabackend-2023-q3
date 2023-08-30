@@ -2,3 +2,10 @@ management:
   health:
     redis:
       enabled: false
+
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/rinchabackend2023-q3
+      auto-index-creation: true

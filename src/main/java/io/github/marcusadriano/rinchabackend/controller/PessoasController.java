@@ -31,7 +31,7 @@ public class PessoasController {
     public ResponseEntity<PessoaResponse> createPessoa(@Validated @RequestBody final CreatePessoaRequest request) {
 
         final var pessoaCreated = pessoaService.create(request);
-        return ResponseEntity.ok().header(HttpHeaders.LOCATION, "/pessoas/" + pessoaCreated.getId()).body(pessoaCreated);
+        return ResponseEntity.ok().header(HttpHeaders.LOCATION, "/pessoas/" + pessoaCreated.getId()).build();
     }
 
     @GetMapping(value = "/pessoas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
