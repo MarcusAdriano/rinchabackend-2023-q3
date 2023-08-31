@@ -32,6 +32,4 @@ public class PessoaDocument {
 
     private List<String> stack;
 
-    private List<String> palavrasChave;
-
 }

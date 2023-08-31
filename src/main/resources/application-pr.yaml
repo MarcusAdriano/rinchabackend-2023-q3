@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://db:27017/rinchabackend2023-q3
+
+logging:
+  level:
+    root: error

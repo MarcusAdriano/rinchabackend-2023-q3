@@ -24,12 +24,7 @@ public class PessoaServiceImpl implements PessoaService {
 
     private PessoaDocument parse(final CreatePessoaRequest request) {
 
-        final var safeEmptyStack = CollectionUtils.emptyIfNull(request.getStack()).stream().toList();
-
-        final List<String> palavrasChave = new ArrayList<>();
-        palavrasChave.add(request.getNome());
-        palavrasChave.add(request.getApelido());
-        palavrasChave.addAll(safeEmptyStack);
+        final List<String> safeEmptyStack = request.getStack() == null ? List.of() : request.getStack();
 
         return PessoaDocument.builder()
                 .id(UUID.randomUUID().toString())
@@ -37,7 +32,6 @@ public class PessoaServiceImpl implements PessoaService {
                 .apelido(request.getApelido())
                 .nascimento(request.getNascimento())
                 .stack(safeEmptyStack)
-                .palavrasChave(palavrasChave)
                 .build();
     }
 

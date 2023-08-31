@@ -3,7 +3,6 @@ management:
     redis:
       enabled: false
 
-
 spring:
   data:
     mongodb:

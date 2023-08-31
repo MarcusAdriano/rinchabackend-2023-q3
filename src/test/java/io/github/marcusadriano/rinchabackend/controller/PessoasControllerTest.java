@@ -109,7 +109,7 @@ class PessoasControllerTest {
                         post("/pessoas")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(req)))
-                .andExpect(status().is(200))
+                .andExpect(status().is(201))
                 .andExpect(header().string("Location", "/pessoas/abc"));
     }
 
