@@ -1,9 +1,9 @@
-package io.github.marcusadriano.rinchabackend.config;
+package io.github.marcusadriano.rinhabackend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "io.github.marcusadriano.rinchabackend.repository")
+@EnableMongoRepositories(basePackages = "io.github.marcusadriano.rinhabackend.repository")
 public class MongoDbConfig {
 }

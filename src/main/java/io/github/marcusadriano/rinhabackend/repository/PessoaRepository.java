@@ -1,6 +1,6 @@
-package io.github.marcusadriano.rinchabackend.repository;
+package io.github.marcusadriano.rinhabackend.repository;
 
-import io.github.marcusadriano.rinchabackend.repository.entity.PessoaDocument;
+import io.github.marcusadriano.rinhabackend.repository.entity.PessoaDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

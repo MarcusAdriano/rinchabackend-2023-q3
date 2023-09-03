@@ -1,7 +1,7 @@
-package io.github.marcusadriano.rinchabackend.service;
+package io.github.marcusadriano.rinhabackend.service;
 
-import io.github.marcusadriano.rinchabackend.dto.api.CreatePessoaRequest;
-import io.github.marcusadriano.rinchabackend.dto.api.PessoaResponse;
+import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
+import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 
 import java.util.List;
 import java.util.Optional;

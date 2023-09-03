@@ -1,4 +1,4 @@
-package io.github.marcusadriano.rinchabackend.controller;
+package io.github.marcusadriano.rinhabackend.controller;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.dao.DuplicateKeyException;

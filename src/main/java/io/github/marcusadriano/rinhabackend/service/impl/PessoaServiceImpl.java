@@ -1,14 +1,12 @@
-package io.github.marcusadriano.rinchabackend.service.impl;
+package io.github.marcusadriano.rinhabackend.service.impl;
 
-import io.github.marcusadriano.rinchabackend.dto.api.CreatePessoaRequest;
-import io.github.marcusadriano.rinchabackend.dto.api.PessoaResponse;
-import io.github.marcusadriano.rinchabackend.repository.PessoaRepository;
-import io.github.marcusadriano.rinchabackend.repository.entity.PessoaDocument;
-import io.github.marcusadriano.rinchabackend.service.PessoaService;
-import org.apache.commons.collections4.CollectionUtils;
+import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
+import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
+import io.github.marcusadriano.rinhabackend.repository.PessoaRepository;
+import io.github.marcusadriano.rinhabackend.repository.entity.PessoaDocument;
+import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

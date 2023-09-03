@@ -1,9 +1,9 @@
-package io.github.marcusadriano.rinchabackend.controller;
+package io.github.marcusadriano.rinhabackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.github.marcusadriano.rinchabackend.dto.api.PessoaResponse;
-import io.github.marcusadriano.rinchabackend.service.PessoaService;
+import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
+import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

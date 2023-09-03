@@ -1,4 +1,4 @@
-package io.github.marcusadriano.rinchabackend.repository.entity;
+package io.github.marcusadriano.rinhabackend.repository.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

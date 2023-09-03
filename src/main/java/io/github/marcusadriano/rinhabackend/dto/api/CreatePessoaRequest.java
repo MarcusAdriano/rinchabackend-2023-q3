@@ -1,4 +1,4 @@
-package io.github.marcusadriano.rinchabackend.dto.api;
+package io.github.marcusadriano.rinhabackend.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
