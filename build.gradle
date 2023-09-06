@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'redis.clients:jedis'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.apache.commons:commons-text:1.10.0'

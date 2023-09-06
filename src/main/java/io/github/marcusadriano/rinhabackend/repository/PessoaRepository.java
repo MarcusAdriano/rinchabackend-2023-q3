@@ -1,14 +1,18 @@
 package io.github.marcusadriano.rinhabackend.repository;
 
-import io.github.marcusadriano.rinhabackend.repository.entity.PessoaDocument;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import io.github.marcusadriano.rinhabackend.repository.mongo.PessoaDocument;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface PessoaRepository extends MongoRepository<PessoaDocument, String> {
+public interface PessoaRepository {
 
-    @Query("{$or: [{nome: {$regex: ?0, $options: 'i'}}, {apelido: {$regex: ?0, $options: 'i'}}, {stack: {$regex: ?0, $options: 'i'}}]}")
-    List<PessoaDocument> findAllByPalavraChave(String palavraChave);
+    PessoaDocument save(PessoaDocument pessoa);
+
+    Optional<PessoaDocument> findById(String id);
+
+    List<PessoaDocument> findAllByFilter(String palavraChave);
+
+    Long count();
 
 }

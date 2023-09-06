@@ -1,4 +1,4 @@
-package io.github.marcusadriano.rinhabackend.repository.entity;
+package io.github.marcusadriano.rinhabackend.repository.mongo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class PessoaDocument {
     @Id
     private String id;
 
+    @TextIndexed
     private String nome;
 
     @Indexed(unique = true)
@@ -30,6 +32,7 @@ public class PessoaDocument {
 
     private LocalDate nascimento;
 
+    @TextIndexed
     private List<String> stack;
 
 }

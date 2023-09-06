@@ -29,6 +29,9 @@ public class PessoasController {
     public ResponseEntity<PessoaResponse> createPessoa(@Validated @RequestBody final CreatePessoaRequest request) {
 
         final var pessoaCreated = pessoaService.create(request);
+        if (pessoaCreated == null) {
+            return ResponseEntity.status(422).build();
+        }
         return ResponseEntity.status(201).header(HttpHeaders.LOCATION, "/pessoas/" + pessoaCreated.getId()).build();
     }
 

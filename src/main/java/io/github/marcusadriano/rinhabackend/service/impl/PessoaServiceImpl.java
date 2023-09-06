@@ -3,7 +3,7 @@ package io.github.marcusadriano.rinhabackend.service.impl;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.repository.PessoaRepository;
-import io.github.marcusadriano.rinhabackend.repository.entity.PessoaDocument;
+import io.github.marcusadriano.rinhabackend.repository.mongo.PessoaDocument;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +34,7 @@ public class PessoaServiceImpl implements PessoaService {
     }
 
     private PessoaResponse parse(final PessoaDocument doc) {
+        if (doc == null) return null;
         return PessoaResponse.builder()
                 .id(doc.getId())
                 .nome(doc.getNome())
@@ -46,8 +47,8 @@ public class PessoaServiceImpl implements PessoaService {
     @Override
     public PessoaResponse create(final CreatePessoaRequest createPessoaRequest) {
         final PessoaDocument pessoaDocument = parse(createPessoaRequest);
-        final PessoaDocument doc = repository.save(pessoaDocument);
-        return parse(doc);
+        final var result = repository.save(pessoaDocument);
+        return parse(result);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PessoaServiceImpl implements PessoaService {
 
     @Override
     public List<PessoaResponse> findByFilter(final String filter) {
-        return repository.findAllByPalavraChave(filter).stream().map(this::parse).toList();
+        return repository.findAllByFilter(filter).stream().map(this::parse).toList();
     }
 
     @Override
