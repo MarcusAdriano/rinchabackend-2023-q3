@@ -3,13 +3,22 @@ services:
   api1: # API - Instância 01
     build: ../.
     hostname: api1
+    network_mode: "host"
     depends_on:
       - db
       - redis
     expose:
-      - "8080"
+      - "9991"
     environment:
       - spring.profiles.active=pr
+      - server.port=9991
+      - spring.application.name=api1
+      - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
+      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=50&minPoolSize=50
+      - management.tracing.sampling.probability=1.0
+      - logging.level.root=INFO
+      - redis.host=localhost
+      - redis.port=6379
     deploy:
       resources:
         limits:
@@ -19,12 +28,21 @@ services:
   api2: # API - Instância 02
     build: ../.
     hostname: api2
+    network_mode: "host"
     depends_on:
       - db
+      - redis
     expose:
-      - "8080"
+      - "9992"
     environment:
       - spring.profiles.active=pr
+      - server.port=9992
+      - spring.application.name=api2
+      - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
+      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=50&minPoolSize=50
+      - management.tracing.sampling.probability=1.0
+      - redis.host=localhost
+      - redis.port=6379
     deploy:
       resources:
         limits:
@@ -33,6 +51,11 @@ services:
 
   redis: # Cache
     image: redis:latest
+    network_mode: "host"
+    expose:
+      - "6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
     deploy:
       resources:
         limits:
@@ -41,11 +64,14 @@ services:
 
   nginx: # Load Balancer
     image: nginx:latest
+    network_mode: "host"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api1
       - api2
+    expose:
+      - "9999"
     ports:
       - "9999:9999"
     deploy:
@@ -56,8 +82,17 @@ services:
 
   db: # Banco de dados
     image: mongo:latest
+    network_mode: "host"
+    expose:
+      - "27017"
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: '1.0GB'
+
+  zipkin:
+    image: openzipkin/zipkin
+    network_mode: "host"
+    expose:
+      - "9411"
