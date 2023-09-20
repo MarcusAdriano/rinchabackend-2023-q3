@@ -6,7 +6,9 @@ import io.github.marcusadriano.rinhabackend.repository.PessoaRepository;
 import io.github.marcusadriano.rinhabackend.repository.mongo.PessoaDocument;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +24,8 @@ public class PessoaServiceImpl implements PessoaService {
 
     private PessoaDocument parse(final CreatePessoaRequest request) {
 
-        final List<String> safeEmptyStack = request.getStack() == null ? List.of() : request.getStack();
+        final List<String> safeEmptyStack = request.getStack() == null ? List.of() :
+                new HashSet<>(request.getStack()).stream().toList();
 
         return PessoaDocument.builder()
                 .id(UUID.randomUUID().toString())
@@ -44,6 +47,7 @@ public class PessoaServiceImpl implements PessoaService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public PessoaResponse create(final CreatePessoaRequest createPessoaRequest) {
         final PessoaDocument pessoaDocument = parse(createPessoaRequest);

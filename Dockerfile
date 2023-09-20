@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine AS build
+FROM eclipse-temurin:17.0.8.1_1-jdk-alpine AS build
 WORKDIR /workspace/app
 
 COPY gradle gradle
@@ -8,7 +8,7 @@ COPY src src
 RUN ./gradlew build -x test
 RUN mkdir -p build/libs/dependency && (cd build/libs/dependency; jar -xf ../*SNAPSHOT.jar)
 
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17.0.8.1_1-jre-alpine
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/build/libs/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib

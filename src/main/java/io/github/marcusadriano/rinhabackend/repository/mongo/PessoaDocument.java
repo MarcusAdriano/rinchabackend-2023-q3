@@ -24,7 +24,6 @@ public class PessoaDocument {
     @Id
     private String id;
 
-    @TextIndexed
     private String nome;
 
     @Indexed(unique = true)
@@ -32,7 +31,6 @@ public class PessoaDocument {
 
     private LocalDate nascimento;
 
-    @TextIndexed
     private List<String> stack;
 
 }

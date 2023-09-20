@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,23 +34,29 @@ public class PessoaCachedRepositoryImpl implements PessoaRepository {
     @Override
     public PessoaDocument save(final PessoaDocument pessoa) {
 
-        if (BooleanUtils.isTrue(redisTemplate.hasKey(pessoa.getApelido()))) {
+        if (BooleanUtils.isTrue(redisTemplate.hasKey(pessoa.getApelido())) ||
+                BooleanUtils.isTrue(redisTemplate.opsForHash().hasKey("pessoa", pessoa.getId()))) {
             return null;
         }
 
         redisTemplate.opsForValue().set(pessoa.getApelido(), "");
         redisTemplate.opsForHash().put("pessoa", pessoa.getId(), pessoa);
 
-        mongoRepository.save(pessoa);
+        saveInDbAsync(pessoa);
 
         return pessoa;
+    }
+
+    @Async
+    public void saveInDbAsync(final PessoaDocument pessoa) {
+        mongoRepository.save(pessoa);
     }
 
     @Override
     public Optional<PessoaDocument> findById(final String id) {
 
         if (BooleanUtils.isFalse(redisTemplate.opsForHash().hasKey("pessoa", id))) {
-            return Optional.empty();
+            return mongoRepository.findById(id);
         }
 
         final var value = redisTemplate.opsForHash().get("pessoa", id);
@@ -59,12 +66,13 @@ public class PessoaCachedRepositoryImpl implements PessoaRepository {
     @Override
     public List<PessoaDocument> findAllByFilter(final String palavraChave) {
 
-        final var criteria = TextCriteria.forDefaultLanguage().matchingAny(palavraChave);
-        final var query = TextQuery.queryText(criteria)
-                .sortByScore()
-                .with(PageRequest.ofSize(50));
-
-        return mongoTemplate.find(query, PessoaDocument.class);
+//        final var criteria = TextCriteria.forDefaultLanguage().matchingAny(palavraChave);
+//        final var query = TextQuery.queryText(criteria)
+//                .sortByScore()
+//                .with(PageRequest.ofSize(50));
+//
+//        return mongoTemplate.find(query, PessoaDocument.class);
+        return mongoRepository.findAllByFilter(palavraChave);
     }
 
     @Override
