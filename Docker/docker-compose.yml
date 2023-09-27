@@ -12,9 +12,7 @@ services:
       - spring.profiles.active=pr
       - server.port=9991
       - spring.application.name=api1
-      - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
       - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=100&minPoolSize=100
-      - management.tracing.sampling.probability=1.0
     deploy:
       resources:
         limits:
@@ -33,9 +31,7 @@ services:
       - spring.profiles.active=pr
       - server.port=9992
       - spring.application.name=api2
-      - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
       - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=100&minPoolSize=100
-      - management.tracing.sampling.probability=1.0
     deploy:
       resources:
         limits:
@@ -72,9 +68,3 @@ services:
         limits:
           cpus: '0.75'
           memory: '1GB'
-
-  zipkin:
-    image: openzipkin/zipkin
-    network_mode: "host"
-    expose:
-      - "9411"

@@ -1,9 +1,11 @@
 package io.github.marcusadriano.rinhabackend.service.impl;
 
+import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.TextSearchOptions;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
@@ -84,8 +86,8 @@ public class PessoaServiceImpl implements PessoaService {
     @Override
     public List<PessoaResponse> findByFilter(final String textoBusca) {
 
-        final var filter = Filters.text(textoBusca);
-        final var collection = db.getCollection("pessoas");
+        final var filter = Filters.text(textoBusca, new TextSearchOptions().caseSensitive(false));
+        final var collection = db.getCollection("pessoas").withReadConcern(ReadConcern.LOCAL);
 
         final var result = collection.find(filter).limit(50);
         return StreamSupport.stream(result.spliterator(), true)

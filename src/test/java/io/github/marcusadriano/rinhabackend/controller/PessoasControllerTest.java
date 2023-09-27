@@ -47,8 +47,7 @@ class PessoasControllerTest {
         when(service.findByFilter(anyString())).thenReturn(List.of(PessoaResponse.builder().id("abc").build()));
 
         mockMvc = MockMvcBuilders.standaloneSetup(new PessoasController(service))
-                .alwaysDo(print())
-                .setControllerAdvice(new PessoaControllerAdvisor()).build();
+                .alwaysDo(print()).build();
     }
 
     private Map<String, Object> createPessoaRequest(final String nome, final String apelido, final String nascimento,
