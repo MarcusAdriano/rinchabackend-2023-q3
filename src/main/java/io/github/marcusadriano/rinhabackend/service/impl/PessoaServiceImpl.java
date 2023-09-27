@@ -4,7 +4,6 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.InsertOneOptions;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
@@ -22,11 +21,9 @@ import java.util.stream.StreamSupport;
 @Service
 public class PessoaServiceImpl implements PessoaService {
 
-    private final MongoClient mongoClient;
     private final MongoDatabase db;
 
     public PessoaServiceImpl(final MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
         this.db = mongoClient.getDatabase("rinchabackend2023-q3");
     }
 
