@@ -1,72 +1,104 @@
 package io.github.marcusadriano.rinhabackend.service.impl;
 
+import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.InsertOneOptions;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
-import io.github.marcusadriano.rinhabackend.repository.PessoaRepository;
-import io.github.marcusadriano.rinhabackend.repository.mongo.PessoaDocument;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
+import org.bson.Document;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class PessoaServiceImpl implements PessoaService {
 
-    private final PessoaRepository repository;
+    private final MongoClient mongoClient;
+    private final MongoDatabase db;
 
-    public PessoaServiceImpl(final PessoaRepository repository) {
-        this.repository = repository;
+    public PessoaServiceImpl(final MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+        this.db = mongoClient.getDatabase("rinchabackend2023-q3");
     }
 
-    private PessoaDocument parse(final CreatePessoaRequest request) {
-
-        final List<String> safeEmptyStack = request.getStack() == null ? List.of() :
-                new HashSet<>(request.getStack()).stream().toList();
-
-        return PessoaDocument.builder()
-                .id(UUID.randomUUID().toString())
-                .nome(request.getNome())
-                .apelido(request.getApelido())
-                .nascimento(request.getNascimento())
-                .stack(safeEmptyStack)
-                .build();
-    }
-
-    private PessoaResponse parse(final PessoaDocument doc) {
-        if (doc == null) return null;
-        return PessoaResponse.builder()
-                .id(doc.getId())
-                .nome(doc.getNome())
-                .apelido(doc.getApelido())
-                .nascimento(doc.getNascimento())
-                .stack(doc.getStack())
-                .build();
-    }
-
-    @Transactional(readOnly = true)
     @Override
-    public PessoaResponse create(final CreatePessoaRequest createPessoaRequest) {
-        final PessoaDocument pessoaDocument = parse(createPessoaRequest);
-        final var result = repository.save(pessoaDocument);
-        return parse(result);
+    public String create(final CreatePessoaRequest createPessoaRequest) {
+
+        HashSet<String> stack = null;
+        if (createPessoaRequest.getStack() != null) {
+            stack = new HashSet<>(createPessoaRequest.getStack());
+        }
+
+        final var id = UUID.randomUUID().toString();
+
+        final var doc = new Document();
+        doc.put("_id", id);
+        doc.put("nome", createPessoaRequest.getNome());
+        doc.put("apelido", createPessoaRequest.getApelido());
+        doc.put("nascimento", LocalDate.parse(createPessoaRequest.getNascimento()));
+        doc.put("stack", stack);
+        doc.put("busca",
+                String.format("%s %s %s",
+                        createPessoaRequest.getNome(),
+                        createPessoaRequest.getApelido(),
+                        createPessoaRequest.getStack() == null ? "" : String.join(" ", createPessoaRequest.getStack())
+                ).trim()
+        );
+
+        final var collection = db.getCollection("pessoas").withWriteConcern(WriteConcern.UNACKNOWLEDGED);
+
+        try {
+            collection.insertOne(doc);
+        } catch (final Exception e) {
+            return null;
+        }
+
+        return id;
+    }
+
+    private final PessoaResponse parse(final Document doc) {
+        final var response = new PessoaResponse();
+        response.setId(doc.getString("_id"));
+        response.setNome(doc.getString("nome"));
+        response.setApelido(doc.getString("apelido"));
+        response.setNascimento(new java.sql.Date(doc.getDate("nascimento").getTime()).toLocalDate());
+        response.setStack(doc.getList("stack", String.class));
+        return response;
     }
 
     @Override
     public Optional<PessoaResponse> findById(final String id) {
-        return repository.findById(id).map(this::parse);
+
+        final var collection = db.getCollection("pessoas");
+        final var doc = collection.find(new Document("_id", id)).first();
+
+        return Optional.ofNullable(doc).map(this::parse);
     }
 
     @Override
-    public List<PessoaResponse> findByFilter(final String filter) {
-        return repository.findAllByFilter(filter).stream().map(this::parse).toList();
+    public List<PessoaResponse> findByFilter(final String textoBusca) {
+
+        final var filter = Filters.text(textoBusca);
+        final var collection = db.getCollection("pessoas");
+
+        final var result = collection.find(filter).limit(50);
+        return StreamSupport.stream(result.spliterator(), true)
+                .map(this::parse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Long count() {
-        return repository.count();
+        final var collection = db.getCollection("pessoas");
+        return collection.countDocuments();
     }
 }

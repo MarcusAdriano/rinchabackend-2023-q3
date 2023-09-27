@@ -6,7 +6,6 @@ import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,13 +26,39 @@ public class PessoasController {
     }
 
     @PostMapping(path = "/pessoas", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PessoaResponse> createPessoa(@Validated @RequestBody final CreatePessoaRequest request) {
+    public ResponseEntity<PessoaResponse> createPessoa(@RequestBody final CreatePessoaRequest request) {
 
-        final var pessoaCreated = pessoaService.create(request);
-        if (pessoaCreated == null) {
+        if (request.getNome() == null || request.getNome().isEmpty() || request.getNome().length() > 100) {
+            return ResponseEntity.status(400).build();
+        }
+
+        if (request.getApelido() == null || request.getApelido().isEmpty() || request.getApelido().length() > 32) {
+            return ResponseEntity.status(400).build();
+        }
+
+        if (request.getNascimento() == null) {
+            return ResponseEntity.status(400).build();
+        }
+
+        try {
+            LocalDate.parse(request.getNascimento());
+        } catch (final Exception e) {
+            return ResponseEntity.status(400).build();
+        }
+
+        if (request.getStack() != null) {
+            for (final var stack : request.getStack()) {
+                if (stack == null || stack.isEmpty() || stack.length() > 32) {
+                    return ResponseEntity.status(400).build();
+                }
+            }
+        }
+
+        final var createdId = pessoaService.create(request);
+        if (createdId == null) {
             return ResponseEntity.status(422).build();
         }
-        return ResponseEntity.status(201).header(HttpHeaders.LOCATION, "/pessoas/" + pessoaCreated.getId()).build();
+        return ResponseEntity.status(201).header(HttpHeaders.LOCATION, "/pessoas/" + createdId).build();
     }
 
     @GetMapping(value = "/pessoas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

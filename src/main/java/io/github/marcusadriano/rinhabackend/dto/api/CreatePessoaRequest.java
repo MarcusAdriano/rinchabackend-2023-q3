@@ -1,9 +1,5 @@
 package io.github.marcusadriano.rinhabackend.dto.api;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,18 +14,12 @@ import java.util.List;
 @NoArgsConstructor
 public class CreatePessoaRequest {
 
-    @NotBlank
-    @Size(max = 32)
     private String apelido;
 
-    @NotBlank
-    @Size(max = 100)
     private String nome;
 
-    @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate nascimento;
+    private String nascimento;
 
-    private List<@NotBlank @Size(max = 32) String> stack;
+    private List<String> stack;
 
 }

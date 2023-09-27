@@ -41,7 +41,7 @@ class PessoasControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        when(service.create(any())).thenReturn(PessoaResponse.builder().id("abc").build());
+        when(service.create(any())).thenReturn("abc");
         when(service.count()).thenReturn(10L);
         when(service.findById(anyString())).thenReturn(Optional.of(PessoaResponse.builder().id("abc").build()));
         when(service.findByFilter(anyString())).thenReturn(List.of(PessoaResponse.builder().id("abc").build()));
@@ -75,29 +75,29 @@ class PessoasControllerTest {
     void test_create_pessoa_validation() throws Exception {
 
         var createReq = createPessoaRequest("marcus", null, null);
-        testValidRequest(createReq, 422);
+        testValidRequest(createReq, 400);
 
         createReq = createPessoaRequest(null, "adriano", null);
-        testValidRequest(createReq, 422);
+        testValidRequest(createReq, 400);
 
         createReq = createPessoaRequest("marcus", "adriano", null);
-        testValidRequest(createReq, 422);
+        testValidRequest(createReq, 400);
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-21-21");
-        testValidRequest(createReq, 422);
+        testValidRequest(createReq, 400);
 
         final var invalidStack = StringUtils.leftPad("", 33, "a");
         createReq = createPessoaRequest("marcus", "adriano", "2021-01-21", invalidStack);
-        testValidRequest(createReq, 422);
+        testValidRequest(createReq, 400);
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-01-21");
-        testValidRequest(createReq, 200);
+        testValidRequest(createReq, 201);
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-01-21", "java");
-        testValidRequest(createReq, 200);
+        testValidRequest(createReq, 201);
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-01-21", "java", "python");
-        testValidRequest(createReq, 200);
+        testValidRequest(createReq, 201);
     }
 
     @Test

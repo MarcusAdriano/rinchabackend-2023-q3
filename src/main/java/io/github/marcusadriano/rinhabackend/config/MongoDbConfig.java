@@ -1,18 +1,17 @@
 package io.github.marcusadriano.rinhabackend.config;
 
-import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.WriteConcernResolver;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "io.github.marcusadriano.rinhabackend.repository.mongo")
 public class MongoDbConfig {
 
     @Bean
-    public WriteConcernResolver writeConcernResolver() {
-        return action -> WriteConcern.UNACKNOWLEDGED;
+    public MongoClient writeConcernResolver(@Value("${spring.data.mongodb.uri:mongodb://localhost:27017}") final String mongoUri) {
+        return MongoClients.create(mongoUri);
     }
 
 }

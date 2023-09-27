@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PessoaService {
 
-    PessoaResponse create(CreatePessoaRequest createPessoaRequest);
+    String create(CreatePessoaRequest createPessoaRequest);
 
     Optional<PessoaResponse> findById(String id);
 

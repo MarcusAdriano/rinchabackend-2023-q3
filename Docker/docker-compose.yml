@@ -6,7 +6,6 @@ services:
     network_mode: "host"
     depends_on:
       - db
-      - redis
     expose:
       - "9991"
     environment:
@@ -14,15 +13,13 @@ services:
       - server.port=9991
       - spring.application.name=api1
       - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
-      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=50&minPoolSize=50
+      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=100&minPoolSize=100
       - management.tracing.sampling.probability=1.0
-      - spring.data.redis.host=localhost
-      - spring.data.redis.port=6379
     deploy:
       resources:
         limits:
           cpus: '0.25'
-          memory: '0.5GB'
+          memory: '500MB'
 
   api2: # API - Instância 02
     build: ../.
@@ -30,7 +27,6 @@ services:
     network_mode: "host"
     depends_on:
       - db
-      - redis
     expose:
       - "9992"
     environment:
@@ -38,28 +34,13 @@ services:
       - server.port=9992
       - spring.application.name=api2
       - management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans
-      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=50&minPoolSize=50
+      - spring.data.mongodb.uri=mongodb://localhost:27017/rinchabackend2023-q3?connectTimeoutMS=3000&socketTimeoutMS=3000&maxPoolSize=100&minPoolSize=100
       - management.tracing.sampling.probability=1.0
-      - spring.data.redis.host=localhost
-      - spring.data.redis.port=6379
     deploy:
       resources:
         limits:
           cpus: '0.25'
-          memory: '0.5GB'
-
-  redis: # Cache
-    image: redis:latest
-    network_mode: "host"
-    expose:
-      - "6379"
-    volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: '0.5GB'
+          memory: '500MB'
 
   nginx: # Load Balancer
     image: nginx:latest
@@ -77,18 +58,20 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: '0.5GB'
+          memory: '1GB'
 
   db: # Banco de dados
     image: mongo:latest
     network_mode: "host"
     expose:
       - "27017"
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: '1.0GB'
+          cpus: '0.75'
+          memory: '1GB'
 
   zipkin:
     image: openzipkin/zipkin
