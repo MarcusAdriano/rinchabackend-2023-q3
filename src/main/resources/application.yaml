@@ -3,6 +3,7 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/rinchabackend2023-q3
       auto-index-creation: true
-    redis:
-      host: localhost
-      port: 6379
+management:
+  endpoints:
+    web:
+      base-path: /

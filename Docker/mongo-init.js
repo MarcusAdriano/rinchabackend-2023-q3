@@ -6,6 +6,8 @@ db.pessoas.createIndex(
 
 db.pessoas.createIndex(
     {
-        "busca": "text",
+        "nome": "text",
+        "apelido": "text",
+        "stack_txt": "text"
     }
 )

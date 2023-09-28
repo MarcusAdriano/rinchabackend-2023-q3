@@ -13,6 +13,7 @@ import org.bson.Document;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -41,19 +42,13 @@ public class PessoaServiceImpl implements PessoaService {
 
         final var doc = new Document();
         doc.put("_id", id);
-        doc.put("nome", createPessoaRequest.getNome());
-        doc.put("apelido", createPessoaRequest.getApelido());
-        doc.put("nascimento", LocalDate.parse(createPessoaRequest.getNascimento()));
+        doc.put("nome", createPessoaRequest.getNome().trim());
+        doc.put("apelido", createPessoaRequest.getApelido().trim());
+        doc.put("nascimento", LocalDate.parse(createPessoaRequest.getNascimento(), DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         doc.put("stack", stack);
-        doc.put("busca",
-                String.format("%s %s %s",
-                        createPessoaRequest.getNome(),
-                        createPessoaRequest.getApelido(),
-                        createPessoaRequest.getStack() == null ? "" : String.join(" ", createPessoaRequest.getStack())
-                ).trim()
-        );
+        doc.put("stack_txt", stack != null ? String.join(",", stack) : "");
 
-        final var collection = db.getCollection("pessoas").withWriteConcern(WriteConcern.UNACKNOWLEDGED);
+        final var collection = db.getCollection("pessoas");
 
         try {
             collection.insertOne(doc);
@@ -64,7 +59,7 @@ public class PessoaServiceImpl implements PessoaService {
         return id;
     }
 
-    private final PessoaResponse parse(final Document doc) {
+    private PessoaResponse parse(final Document doc) {
         final var response = new PessoaResponse();
         response.setId(doc.getString("_id"));
         response.setNome(doc.getString("nome"));
@@ -92,7 +87,7 @@ public class PessoaServiceImpl implements PessoaService {
         final var result = collection.find(filter).limit(50);
         return StreamSupport.stream(result.spliterator(), true)
                 .map(this::parse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
