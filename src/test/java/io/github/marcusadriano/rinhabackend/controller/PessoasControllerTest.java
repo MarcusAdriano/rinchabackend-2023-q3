@@ -2,6 +2,7 @@ package io.github.marcusadriano.rinhabackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.github.marcusadriano.rinhabackend.config.AppConfig;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
 import org.apache.commons.lang3.StringUtils;
@@ -10,10 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,8 +24,8 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -47,11 +50,12 @@ class PessoasControllerTest {
         when(service.findByFilter(anyString())).thenReturn(List.of(PessoaResponse.builder().id("abc").build()));
 
         mockMvc = MockMvcBuilders.standaloneSetup(new PessoasController(service))
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(new AppConfig().mapper()))
                 .alwaysDo(print()).build();
     }
 
-    private Map<String, Object> createPessoaRequest(final String nome, final String apelido, final String nascimento,
-                                                    final String... stack) {
+    private Map<String, Object> createPessoaRequest(final Object nome, final String apelido, final String nascimento,
+                                                    final Object... stack) {
 
         final Map<String, Object> json = new HashMap<>();
         json.put("nome", nome);
@@ -74,13 +78,13 @@ class PessoasControllerTest {
     void test_create_pessoa_validation() throws Exception {
 
         var createReq = createPessoaRequest("marcus", null, null);
-        testValidRequest(createReq, 400);
+        testValidRequest(createReq, 422);
 
         createReq = createPessoaRequest(null, "adriano", null);
-        testValidRequest(createReq, 400);
+        testValidRequest(createReq, 422);
 
         createReq = createPessoaRequest("marcus", "adriano", null);
-        testValidRequest(createReq, 400);
+        testValidRequest(createReq, 422);
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-21-21");
         testValidRequest(createReq, 400);
@@ -97,10 +101,34 @@ class PessoasControllerTest {
 
         createReq = createPessoaRequest("marcus", "adriano", "2021-01-21", "java", "python");
         testValidRequest(createReq, 201);
+
+        createReq = createPessoaRequest(123, "adriano", "2021-01-21", "java", "python");
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest("marcus", "adriano", "2021-01-21", "java", "python", 1);
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest("marcus", "adriano", "2023-02-29", "java", "python");
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest("marcus", "adriano", "2021-02-30", "java", "python");
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest("marcus", "adriano", "2024-02-29", "java", "python");
+        testValidRequest(createReq, 201);
+
+        createReq = createPessoaRequest(false, "adriano", "2024-02-25", "java", "python");
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest(new HashMap<>(), "adriano", "2024-02-25", "java", "python");
+        testValidRequest(createReq, 400);
+
+        createReq = createPessoaRequest(new LinkedList<>(), "adriano", "2024-02-25", "java", "python");
+        testValidRequest(createReq, 400);
     }
 
     @Test
-    void test_create_with_success() throws Exception{
+    void test_create_with_success() throws Exception {
 
         final var req = createPessoaRequest("marcus", "marcus", "1997-02-25", "Java", "StringBoot");
 

@@ -1,7 +1,6 @@
 package io.github.marcusadriano.rinhabackend.service.impl;
 
 import com.mongodb.ReadConcern;
-import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -9,16 +8,14 @@ import com.mongodb.client.model.TextSearchOptions;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
+import io.github.marcusadriano.rinhabackend.utils.DateUtils;
 import org.bson.Document;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -44,9 +41,15 @@ public class PessoaServiceImpl implements PessoaService {
         doc.put("_id", id);
         doc.put("nome", createPessoaRequest.getNome().trim());
         doc.put("apelido", createPessoaRequest.getApelido().trim());
-        doc.put("nascimento", LocalDate.parse(createPessoaRequest.getNascimento(), DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        doc.put("nascimento", DateUtils.parseDate(createPessoaRequest.getNascimento()));
         doc.put("stack", stack);
-        doc.put("stack_txt", stack != null ? String.join(",", stack) : "");
+        doc.put("busca",
+                String.format("%s %s %s",
+                        createPessoaRequest.getNome(),
+                        createPessoaRequest.getApelido(),
+                        createPessoaRequest.getStack() == null ? "" : String.join(" ", createPessoaRequest.getStack())
+                ).trim()
+        );
 
         final var collection = db.getCollection("pessoas");
 

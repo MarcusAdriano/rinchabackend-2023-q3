@@ -3,6 +3,7 @@ package io.github.marcusadriano.rinhabackend.controller;
 import io.github.marcusadriano.rinhabackend.dto.api.CreatePessoaRequest;
 import io.github.marcusadriano.rinhabackend.dto.api.PessoaResponse;
 import io.github.marcusadriano.rinhabackend.service.PessoaService;
+import io.github.marcusadriano.rinhabackend.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -31,20 +30,18 @@ public class PessoasController {
     public ResponseEntity<PessoaResponse> createPessoa(@RequestBody final CreatePessoaRequest request) {
 
         if (StringUtils.isEmpty(request.getApelido()) || request.getApelido().length() > 32) {
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(422).build();
         }
 
         if (StringUtils.isEmpty(request.getNome()) || request.getNome().length() > 100) {
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(422).build();
         }
 
         if (request.getNascimento() == null) {
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(422).build();
         }
 
-        try {
-            LocalDate.parse(request.getNascimento(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        } catch (final Exception e) {
+        if (!DateUtils.isValidDate(request.getNascimento())) {
             return ResponseEntity.status(400).build();
         }
 

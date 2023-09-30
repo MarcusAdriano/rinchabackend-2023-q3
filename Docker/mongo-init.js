@@ -4,10 +4,7 @@ db.pessoas.createIndex(
     {"apelido": 1},
     {unique: true});
 
-db.pessoas.createIndex(
-    {
-        "nome": "text",
-        "apelido": "text",
-        "stack_txt": "text"
+db.pessoas.createIndex({
+        "busca": "text"
     }
 )
